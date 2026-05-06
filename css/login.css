@@ -1,0 +1,38 @@
+/* css/login.css */
+.login-layout {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&q=80&w=1600');
+    background-size: cover;
+    background-position: center;
+}
+
+.login-card {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+    width: 100%;
+    max-width: 380px;
+    text-align: center;
+}
+
+.login-card h1 {
+    color: #c62828;
+    margin-bottom: 10px;
+    font-size: 2rem;
+}
+
+.login-card p {
+    color: #666;
+    margin-bottom: 30px;
+    font-size: 0.9rem;
+}
+
+.footer-text {
+    margin-top: 25px;
+    font-size: 0.8rem;
+    color: #888;
+}
