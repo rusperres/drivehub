@@ -27,7 +27,7 @@ if (isset($_POST['btnUpdate'])) {
     <link rel="stylesheet" href="../css/forms.css">
 </head>
 <body>
-    <nav><h1>DriveHub</h1></nav>
+    <?php include('../components/navbar.php')?>
     <div class="main-content">
         <div class="form-card">
             <h2>Edit Your Profile</h2>
