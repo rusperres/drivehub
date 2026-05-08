@@ -37,6 +37,7 @@ if (!isset($_SESSION['username'])) {
         <div class="access-card">
             <h3>Booking</h3>
             <a href="pages/transactions/add_reservation.php">New Reservation</a>
+            <a href="pages/transactions/add_rental.php">Add Rental</a>
             <a href="pages/transactions/display_rental.php">Active Rentals</a>
         </div>
         <div class="access-card">
