@@ -62,6 +62,7 @@ Please follow these coding standards to ensure security and consistency:
 4.  **Relative Paths**:
     - If your page is in a subfolder (e.g., `pages/fleet/`), use `../../` to access `utils/` or `css/`.
     - Example: `include('../../utils/db.php');`
+ 
 
 ---
 

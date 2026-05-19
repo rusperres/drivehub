@@ -26,6 +26,9 @@ if (isset($_POST['btnSave'])) {
         echo "<script>alert('Error: " . $stmt->error . "');</script>";
     }
 }
+    $stmt_cars = $conn->prepare("SELECT carID, brand, model, plateNumber FROM car");
+    $stmt_cars->execute();
+    $cars_list = $stmt_cars->get_result();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -37,30 +40,43 @@ if (isset($_POST['btnSave'])) {
     <link rel="stylesheet" href="../../css/forms.css">
 </head>
 <body>
-    <nav style="background: white; padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+    <nav class="navbar">
         <div class="logo-area">
             <a href="../../index.php">
-                <h1 style="color: #c62828; margin: 0; font-size: 1.5rem;">DriveHub</h1>
+                <h1 class="navbar-logo">DriveHub</h1>
             </a>
         </div>
-        <div class="user-area" style="display: flex; align-items: center; gap: 20px;">
-            <span style="color: #555; font-weight: 600;">
+        <div class="user-area">
+            <span class="user-welcome">
                 Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?>!
             </span>
-            <a href="../edit_profile.php" style="text-decoration: none; color: #555; font-size: 0.9rem;">Edit Profile</a>
-            <a href="../fleet/display_car.php" style="text-decoration: none; color: #555; font-size: 0.9rem;">View Fleet</a>
-            <a href="../logout.php" style="text-decoration: none; color: #c62828; border: 1px solid #c62828; padding: 5px 15px; border-radius: 5px; font-weight: 600;">Logout</a>
+            <a href="../edit_profile.php" class="nav-link">Edit Profile</a>
+            <a href="../fleet/display_car.php" class="nav-link">View Fleet</a>
+            <a href="../logout.php" class="btn-logout">Logout</a>
         </div>
     </nav>
     <div class="main-content">
         <div class="form-card">
             <h2>Maintenance Record</h2>
             <form method="POST">
-                <input type="number" name="carID" placeholder="Car ID" required style="width: 100%; padding: 12px 15px; margin-bottom: 20px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box;">
-                <input type="date" name="maintenanceDate" required style="width: 100%; padding: 12px 15px; margin-bottom: 20px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box;">
+                <div class="form-group">
+                    <label for="carID">Vehicle</label>
+                    <select name="carID" id="carID" required >
+                        <option value="">-- Select Vehicle --</option>
+                        <?php while($car = $cars_list->fetch_assoc()): ?>
+                            <option value="<?php echo $car['carID']; ?>">
+                                <?php echo htmlspecialchars($car['brand'] . " " . $car['model'] . " (" . $car['plateNumber'] . ")"); ?>
+                            </option>
+                        <?php endwhile; ?>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="maintenanceDate">Maintenance Date</label>
+                    <input type="date" name="maintenanceDate" id="maintenanceDate" required >
+                </div>
                 <input type="text" name="maintenanceType" placeholder="Maintenance Type (e.g. Oil Change)" required>
-                <input type="number" step="0.01" name="cost" placeholder="Cost" required style="width: 100%; padding: 12px 15px; margin-bottom: 20px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box;">
-                <textarea name="maintenanceDescription" placeholder="Description" required style="width: 100%; padding: 12px 15px; margin-bottom: 20px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; height: 80px;"></textarea>
+                <input type="number" step="0.01" name="cost" placeholder="Cost" required >
+                <textarea name="maintenanceDescription" placeholder="Description" required ></textarea>
                 <button type="submit" name="btnSave" class="btn-submit">Save Record</button>
             </form>
             <a href="../../index.php" class="back-link">← Cancel and Back</a>
@@ -68,3 +84,6 @@ if (isset($_POST['btnSave'])) {
     </div>
 </body>
 </html>
+<?php
+$stmt_cars->close();
+?>

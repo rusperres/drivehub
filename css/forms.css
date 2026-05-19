@@ -30,7 +30,9 @@
     color: #888;
 }
 
-input[type="text"], input[type="email"], input[type="password"] {
+input[type="text"], input[type="email"], input[type="password"],
+input[type="number"], input[type="date"], input[type="datetime-local"],
+select, textarea {
     width: 100%;
     padding: 12px 15px;
     margin-bottom: 20px;
@@ -40,9 +42,17 @@ input[type="text"], input[type="email"], input[type="password"] {
     font-family: 'Poppins', sans-serif;
     outline: none;
     transition: 0.3s;
+    background-color: white;
 }
 
-input[type="text"]:focus, input[type="email"]:focus, input[type="password"]:focus {
+textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+input[type="text"]:focus, input[type="email"]:focus, input[type="password"]:focus,
+input[type="number"]:focus, input[type="date"]:focus, input[type="datetime-local"]:focus,
+select:focus, textarea:focus {
     border-color: #c62828;
     box-shadow: 0 0 5px rgba(198, 40, 40, 0.2);
 }
@@ -114,24 +124,7 @@ input[type="text"]:focus, input[type="email"]:focus, input[type="password"]:focu
     transform: translateY(-2px);
 }
 
-select {
-    width: 100%;
-    padding: 12px 15px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    font-family: 'Poppins', sans-serif;
-    outline: none;
-    background-color: white;
-}
 
-input[type="datetime-local"] {
-    width: 100%;
-    padding: 12px 15px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    font-family: 'Poppins', sans-serif;
-    outline: none;
-}
 
 label {
     display: block;

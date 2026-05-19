@@ -12,11 +12,12 @@ if (isset($_POST['btnSave'])) {
     $plate = $_POST['plate'];
     $brand = $_POST['brand'];
     $model = $_POST['model'];
+    $categoryID = $_POST['categoryID'];
 
     $sql = "INSERT INTO car (plateNumber, brand, model, status, categoryID) 
-            VALUES (?, ?, ?, 'Available', 1)";
+            VALUES (?, ?, ?, 'Available', ?)";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("sss", $plate, $brand, $model);
+    $stmt->bind_param("sssi", $plate, $brand, $model, $categoryID);
 
     if ($stmt->execute()) {
         header("Location: display_car.php");
@@ -25,6 +26,10 @@ if (isset($_POST['btnSave'])) {
         echo "<script>alert('Error: " . $stmt->error . "');</script>";
     }
 }
+
+$stmt_cats = $conn->prepare("SELECT categoryID, categoryName, dailyRate FROM carcategory");
+$stmt_cats->execute();
+$categories_list = $stmt_cats->get_result();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -38,19 +43,19 @@ if (isset($_POST['btnSave'])) {
 </head>
 
 <body>
-    <nav style="background: white; padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+    <nav class="navbar">
         <div class="logo-area">
             <a href="../../index.php">
-                <h1 style="color: #c62828; margin: 0; font-size: 1.5rem;">DriveHub</h1>
+                <h1 class="navbar-logo">DriveHub</h1>
             </a>
         </div>
-        <div class="user-area" style="display: flex; align-items: center; gap: 20px;">
-            <span style="color: #555; font-weight: 600;">
+        <div class="user-area">
+            <span class="user-welcome">
                 Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?>!
             </span>
-            <a href="../edit_profile.php" style="text-decoration: none; color: #555; font-size: 0.9rem;">Edit Profile</a>
-            <a href="../fleet/display_car.php" style="text-decoration: none; color: #555; font-size: 0.9rem;">View Fleet</a>
-            <a href="../logout.php" style="text-decoration: none; color: #c62828; border: 1px solid #c62828; padding: 5px 15px; border-radius: 5px; font-weight: 600;">Logout</a>
+            <a href="../edit_profile.php" class="nav-link">Edit Profile</a>
+            <a href="../fleet/display_car.php" class="nav-link">View Fleet</a>
+            <a href="../logout.php" class="btn-logout">Logout</a>
         </div>
     </nav>
     <div class="main-content">
@@ -60,6 +65,17 @@ if (isset($_POST['btnSave'])) {
                 <input type="text" name="plate" placeholder="Plate Number (e.g. ABC-1234)" required>
                 <input type="text" name="brand" placeholder="Vehicle Brand (e.g. Toyota)" required>
                 <input type="text" name="model" placeholder="Vehicle Model (e.g. Vios)" required>
+                <div class="form-group">
+                    <label for="categoryID">Vehicle Category</label>
+                    <select name="categoryID" id="categoryID" required >
+                        <option value="">-- Select Category --</option>
+                        <?php while($cat = $categories_list->fetch_assoc()): ?>
+                            <option value="<?php echo $cat['categoryID']; ?>">
+                                <?php echo htmlspecialchars($cat['categoryName']); ?> ($<?php echo $cat['dailyRate']; ?>/day)
+                            </option>
+                        <?php endwhile; ?>
+                    </select>
+                </div>
                 <button type="submit" name="btnSave" class="btn-submit">Save Vehicle Record</button>
             </form>
             <a href="../../index.php" class="back-link">← Cancel and Back to Dashboard</a>
@@ -67,5 +83,7 @@ if (isset($_POST['btnSave'])) {
     </div>
 
 </body>
-
 </html>
+<?php
+$stmt_cats->close();
+?>

@@ -7,7 +7,11 @@ if (!isset($_SESSION['username'])) {
     exit();
 }
 
-$query = "SELECT * FROM payment";
+$query = "SELECT p.*, r.rentalID, u.username
+          FROM payment p
+          LEFT JOIN rental r ON p.rentalID = r.rentalID
+          LEFT JOIN customer c ON r.customerID = c.customerID
+          LEFT JOIN users u ON c.userID = u.userID";
 $stmt = $conn->prepare($query);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -21,19 +25,19 @@ $result = $stmt->get_result();
     <link rel="stylesheet" href="../../css/tables.css">
 </head>
 <body>
-    <nav style="background: white; padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+    <nav class="navbar">
         <div class="logo-area">
             <a href="../../index.php">
-                <h1 style="color: #c62828; margin: 0; font-size: 1.5rem;">DriveHub</h1>
+                <h1 class="navbar-logo">DriveHub</h1>
             </a>
         </div>
-        <div class="user-area" style="display: flex; align-items: center; gap: 20px;">
-            <span style="color: #555; font-weight: 600;">
+        <div class="user-area">
+            <span class="user-welcome">
                 Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?>!
             </span>
-            <a href="../edit_profile.php" style="text-decoration: none; color: #555; font-size: 0.9rem;">Edit Profile</a>
-            <a href="../fleet/display_car.php" style="text-decoration: none; color: #555; font-size: 0.9rem;">View Fleet</a>
-            <a href="../logout.php" style="text-decoration: none; color: #c62828; border: 1px solid #c62828; padding: 5px 15px; border-radius: 5px; font-weight: 600;">Logout</a>
+            <a href="../edit_profile.php" class="nav-link">Edit Profile</a>
+            <a href="../fleet/display_car.php" class="nav-link">View Fleet</a>
+            <a href="../logout.php" class="btn-logout">Logout</a>
         </div>
     </nav>
     <div class="container">
@@ -43,7 +47,7 @@ $result = $stmt->get_result();
             <thead>
                 <tr>
                     <th>ID</th>
-                    <th>Rental ID</th>
+                    <th>Rental Agreement</th>
                     <th>Date</th>
                     <th>Method</th>
                     <th>Amount</th>
@@ -53,9 +57,9 @@ $result = $stmt->get_result();
                 <?php while($row = $result->fetch_assoc()) { ?>
                 <tr>
                     <td><?php echo $row['paymentID']; ?></td>
-                    <td><?php echo $row['rentalID']; ?></td>
-                    <td><?php echo $row['paymentDate']; ?></td>
-                    <td><?php echo $row['paymentMethod']; ?></td>
+                    <td>Rental #<?php echo $row['rentalID']; ?> (<?php echo htmlspecialchars($row['username']); ?>)</td>
+                    <td><?php echo htmlspecialchars($row['paymentDate']); ?></td>
+                    <td><?php echo htmlspecialchars($row['paymentMethod']); ?></td>
                     <td><?php echo number_format($row['amountPaid'], 2); ?></td>
                 </tr>
                 <?php } ?>

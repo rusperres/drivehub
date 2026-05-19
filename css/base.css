@@ -15,3 +15,50 @@ a {
 .container {
     padding: 50px 5%;
 }
+
+.navbar {
+    background: white;
+    padding: 15px 5%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.navbar-logo {
+    color: #c62828;
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+.user-area {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.user-welcome {
+    color: #555;
+    font-weight: 600;
+}
+
+.nav-link {
+    text-decoration: none;
+    color: #555;
+    font-size: 0.9rem;
+}
+
+.btn-logout {
+    text-decoration: none;
+    color: #c62828;
+    border: 1px solid #c62828;
+    padding: 5px 15px;
+    border-radius: 5px;
+    font-weight: 600;
+    transition: 0.3s;
+}
+
+.btn-logout:hover {
+    background: #c62828;
+    color: white;
+}

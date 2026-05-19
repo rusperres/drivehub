@@ -26,6 +26,13 @@ if (isset($_POST['btnSave'])) {
         echo "<script>alert('Error: " . $stmt->error . "');</script>";
     }
 }
+    $stmt_rentals = $conn->prepare("SELECT r.rentalID, c.brand, c.model, u.username FROM rental r JOIN car c ON r.carID = c.carID JOIN customer cust ON r.customerID = cust.customerID JOIN users u ON cust.userID = u.userID");
+    $stmt_rentals->execute();
+    $rentals_list = $stmt_rentals->get_result();
+
+    $stmt_customers = $conn->prepare("SELECT c.customerID, u.username FROM customer c JOIN users u ON c.userID = u.userID");
+    $stmt_customers->execute();
+    $customers_list = $stmt_customers->get_result();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -37,28 +44,48 @@ if (isset($_POST['btnSave'])) {
     <link rel="stylesheet" href="../../css/forms.css">
 </head>
 <body>
-    <nav style="background: white; padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+    <nav class="navbar">
         <div class="logo-area">
             <a href="../../index.php">
-                <h1 style="color: #c62828; margin: 0; font-size: 1.5rem;">DriveHub</h1>
+                <h1 class="navbar-logo">DriveHub</h1>
             </a>
         </div>
-        <div class="user-area" style="display: flex; align-items: center; gap: 20px;">
-            <span style="color: #555; font-weight: 600;">
+        <div class="user-area">
+            <span class="user-welcome">
                 Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?>!
             </span>
-            <a href="../edit_profile.php" style="text-decoration: none; color: #555; font-size: 0.9rem;">Edit Profile</a>
-            <a href="../fleet/display_car.php" style="text-decoration: none; color: #555; font-size: 0.9rem;">View Fleet</a>
-            <a href="../logout.php" style="text-decoration: none; color: #c62828; border: 1px solid #c62828; padding: 5px 15px; border-radius: 5px; font-weight: 600;">Logout</a>
+            <a href="../edit_profile.php" class="nav-link">Edit Profile</a>
+            <a href="../fleet/display_car.php" class="nav-link">View Fleet</a>
+            <a href="../logout.php" class="btn-logout">Logout</a>
         </div>
     </nav>
     <div class="main-content">
         <div class="form-card">
             <h2>Customer Review</h2>
             <form method="POST">
-                <input type="number" name="rentalID" placeholder="Rental ID" required style="width: 100%; padding: 12px 15px; margin-bottom: 20px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box;">
-                <input type="number" name="customerID" placeholder="Customer ID" required style="width: 100%; padding: 12px 15px; margin-bottom: 20px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box;">
-                <select name="rating" required style="width: 100%; padding: 12px 15px; margin-bottom: 20px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box;">
+                <div class="form-group">
+                    <label for="rentalID">Rental Agreement</label>
+                    <select name="rentalID" id="rentalID" required >
+                        <option value="">-- Select Rental --</option>
+                        <?php while($rent = $rentals_list->fetch_assoc()): ?>
+                            <option value="<?php echo $rent['rentalID']; ?>">
+                                Rental #<?php echo $rent['rentalID']; ?> - <?php echo htmlspecialchars($rent['brand'] . " " . $rent['model'] . " (by " . $rent['username'] . ")"); ?>
+                            </option>
+                        <?php endwhile; ?>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="customerID">Reviewing Customer</label>
+                    <select name="customerID" id="customerID" required >
+                        <option value="">-- Select Customer --</option>
+                        <?php while($cust = $customers_list->fetch_assoc()): ?>
+                            <option value="<?php echo $cust['customerID']; ?>">
+                                <?php echo htmlspecialchars($cust['username']); ?>
+                            </option>
+                        <?php endwhile; ?>
+                    </select>
+                </div>
+                <select name="rating" required >
                     <option value="">Select Rating</option>
                     <option value="5">5 - Excellent</option>
                     <option value="4">4 - Good</option>
@@ -66,7 +93,7 @@ if (isset($_POST['btnSave'])) {
                     <option value="2">2 - Poor</option>
                     <option value="1">1 - Terrible</option>
                 </select>
-                <textarea name="comment" placeholder="Comment" required style="width: 100%; padding: 12px 15px; margin-bottom: 20px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; height: 80px;"></textarea>
+                <textarea name="comment" placeholder="Comment" required ></textarea>
                 <button type="submit" name="btnSave" class="btn-submit">Save Review</button>
             </form>
             <a href="../../index.php" class="back-link">← Cancel and Back</a>
@@ -74,3 +101,7 @@ if (isset($_POST['btnSave'])) {
     </div>
 </body>
 </html>
+<?php
+$stmt_rentals->close();
+$stmt_customers->close();
+?>

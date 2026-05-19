@@ -26,6 +26,13 @@ if (isset($_POST['btnSave'])) {
         echo "<script>alert('Error: " . $stmt->error . "');</script>";
     }
 }
+    $stmt_customers = $conn->prepare("SELECT c.customerID, u.username FROM customer c JOIN users u ON c.userID = u.userID");
+    $stmt_customers->execute();
+    $customers_list = $stmt_customers->get_result();
+
+    $stmt_cars = $conn->prepare("SELECT carID, brand, model, plateNumber FROM car");
+    $stmt_cars->execute();
+    $cars_list = $stmt_cars->get_result();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -37,31 +44,55 @@ if (isset($_POST['btnSave'])) {
     <link rel="stylesheet" href="../../css/forms.css">
 </head>
 <body>
-    <nav style="background: white; padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+    <nav class="navbar">
         <div class="logo-area">
             <a href="../../index.php">
-                <h1 style="color: #c62828; margin: 0; font-size: 1.5rem;">DriveHub</h1>
+                <h1 class="navbar-logo">DriveHub</h1>
             </a>
         </div>
-        <div class="user-area" style="display: flex; align-items: center; gap: 20px;">
-            <span style="color: #555; font-weight: 600;">
+        <div class="user-area">
+            <span class="user-welcome">
                 Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?>!
             </span>
-            <a href="../edit_profile.php" style="text-decoration: none; color: #555; font-size: 0.9rem;">Edit Profile</a>
-            <a href="../fleet/display_car.php" style="text-decoration: none; color: #555; font-size: 0.9rem;">View Fleet</a>
-            <a href="../logout.php" style="text-decoration: none; color: #c62828; border: 1px solid #c62828; padding: 5px 15px; border-radius: 5px; font-weight: 600;">Logout</a>
+            <a href="../edit_profile.php" class="nav-link">Edit Profile</a>
+            <a href="../fleet/display_car.php" class="nav-link">View Fleet</a>
+            <a href="../logout.php" class="btn-logout">Logout</a>
         </div>
     </nav>
     <div class="main-content">
         <div class="form-card">
             <h2>Reservation Entry</h2>
             <form method="POST">
-                <input type="number" name="customerID" placeholder="Customer ID" required style="width: 100%; padding: 12px 15px; margin-bottom: 20px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box;">
-                <input type="number" name="carID" placeholder="Car ID" required style="width: 100%; padding: 12px 15px; margin-bottom: 20px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box;">
-                <div class="form-group-label" style="text-align: left; font-size: 0.8rem; color: #888; margin-bottom: 5px;">Pickup Date:</div>
-                <input type="datetime-local" name="pickupDate" required style="width: 100%; padding: 12px 15px; margin-bottom: 20px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box;">
-                <div class="form-group-label" style="text-align: left; font-size: 0.8rem; color: #888; margin-bottom: 5px;">Return Date:</div>
-                <input type="datetime-local" name="returnDate" required style="width: 100%; padding: 12px 15px; margin-bottom: 20px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box;">
+                <div class="form-group">
+                    <label for="customerID">Customer</label>
+                    <select name="customerID" id="customerID" required >
+                        <option value="">-- Select Customer --</option>
+                        <?php while($cust = $customers_list->fetch_assoc()): ?>
+                            <option value="<?php echo $cust['customerID']; ?>">
+                                <?php echo htmlspecialchars($cust['username']); ?>
+                            </option>
+                        <?php endwhile; ?>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="carID">Vehicle</label>
+                    <select name="carID" id="carID" required >
+                        <option value="">-- Select Vehicle --</option>
+                        <?php while($car = $cars_list->fetch_assoc()): ?>
+                            <option value="<?php echo $car['carID']; ?>">
+                                <?php echo htmlspecialchars($car['brand'] . " " . $car['model'] . " (" . $car['plateNumber'] . ")"); ?>
+                            </option>
+                        <?php endwhile; ?>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="pickupDate">Pickup Date</label>
+                    <input type="datetime-local" name="pickupDate" id="pickupDate" required >
+                </div>
+                <div class="form-group">
+                    <label for="returnDate">Return Date</label>
+                    <input type="datetime-local" name="returnDate" id="returnDate" required >
+                </div>
                 <button type="submit" name="btnSave" class="btn-submit">Save Reservation</button>
             </form>
             <a href="../../index.php" class="back-link">← Cancel and Back</a>
@@ -69,3 +100,7 @@ if (isset($_POST['btnSave'])) {
     </div>
 </body>
 </html>
+<?php
+$stmt_customers->close();
+$stmt_cars->close();
+?>
